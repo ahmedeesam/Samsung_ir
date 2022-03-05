@@ -34,21 +34,21 @@ ISR (INT0_vect)
 		{
 			if ((puls_time > 4400) && (puls_time < 4600) )
 			{
-				puls_comp.start2 = 1;
+				puls_comp[count].start2 = 1;
 			}
 		}
-		if ((puls_comp.start1 == 1) && (puls_comp.start2 == 1) && (puls_num > 2))
+		if ((puls_comp[count].start1 == 1) && (puls_comp[count].start2 == 1) && (puls_num > 2))
 		{
 		if ((bit_num >= 0) && (bit_num <= 7))
 		{
 			if ((puls_time > 1100) && (puls_time < 1400) )  //1250 for LOW +- 50 timing error
 			{
-				puls_comp.address_ = (puls_comp.address_ << 1);
+				puls_comp[count].address_ = (puls_comp[count].address_ << 1);
 				serial_debug("0");
 			}
 			else if ((puls_time > 2200) && (puls_time < 2300) )  //2250 for HIGH +- 50 timing error
 			{
-				puls_comp.address_ = (puls_comp.address_ << 1)|(0x01);
+				puls_comp[count].address_ = (puls_comp[count].address_ << 1)|(0x01);
 				serial_debug("1");
 			}
 			bit_num++;
@@ -58,12 +58,12 @@ ISR (INT0_vect)
 		{
 			if ((puls_time > 1100) && (puls_time < 1400) )  //1250 for LOW +- 50 timing error
 			{
-				puls_comp.address_INV = (puls_comp.address_INV << 1);
+				puls_comp[count].address_INV = (puls_comp[count].address_INV << 1);
 				serial_debug("0");
 			}
 			else if ((puls_time > 2200) && (puls_time < 2300) )  //2250 for HIGH +- 50 timing error
 			{
-				puls_comp.address_INV = (puls_comp.address_INV << 1)|(0x01);
+				puls_comp[count].address_INV = (puls_comp[count].address_INV << 1)|(0x01);
 				serial_debug("1");
 			}
 			bit_num++;
@@ -73,12 +73,12 @@ ISR (INT0_vect)
 		{
 			if ((puls_time > 1100) && (puls_time < 1400) )  //1250 for LOW +- 50 timing error
 			{
-				puls_comp.command_ = (puls_comp.command_ << 1);
+				puls_comp[count].command_ = (puls_comp[count].command_ << 1);
 				serial_debug("0");
 			}
 			else if ((puls_time > 2200) && (puls_time < 2300) )  //2250 for HIGH +- 50 timing error
 			{
-				puls_comp.command_ = (puls_comp.command_ << 1)|(0x01);
+				puls_comp[count].command_ = (puls_comp[count].command_ << 1)|(0x01);
 				serial_debug("1");
 			}
 			bit_num++;
@@ -88,12 +88,12 @@ ISR (INT0_vect)
 		{
 			if ((puls_time > 1100) && (puls_time < 1400) )  //1250 for LOW +- 50 timing error
 			{
-				puls_comp.command_INV = (puls_comp.command_INV << 1);
+				puls_comp[count].command_INV = (puls_comp[count].command_INV << 1);
 				serial_debug("0");
 			}
 			else if ((puls_time > 2200) && (puls_time < 2300) )  //2250 for HIGH +- 50 timing error
 			{
-				puls_comp.command_INV = (puls_comp.command_INV << 1)|(0x01);
+				puls_comp[count].command_INV = (puls_comp[count].command_INV << 1)|(0x01);
 				serial_debug("1");
 			}
 			bit_num++;
@@ -110,7 +110,7 @@ ISR (INT1_vect)
 	puls_num++;
 		if ((puls_time > 4400) && (puls_time < 4600 ) )
 		{
-			puls_comp.start1 = 1;
+			puls_comp[count].start1 = 1;
 		}
 	start_tim1_normal();
 	int1_STOP();
@@ -126,22 +126,25 @@ int reverse(int b) {
 int main(void)
 {
 	_delay_ms(3000);
+	count = 0;
 	DDRD |= (1<<PORTD6);
 	uart_init();
-	puls_comp.address_    = 0xE0;
+	/*puls_comp.address_    = 0xE0;
 	puls_comp.address_INV = 0xE0;
 	puls_comp.command_    = 0x40;
 	puls_comp.command_INV = 0xBF;
 		puls_comp.address_    = reverse(puls_comp.address_);
 		puls_comp.address_INV = reverse(puls_comp.address_INV);
 		puls_comp.command_    = reverse(puls_comp.command_);
-		puls_comp.command_INV = reverse(puls_comp.command_INV);
-	/*int0_START();     
-	serial_debug("signal:");*/
+		puls_comp.command_INV = reverse(puls_comp.command_INV);*/
+	int0_START();     
+	serial_debug("signal:");
 	 
 	while (1)
 	{
-		/*int1_init();
+		while (count < 4)
+	{
+		int1_init();
 		sei();
 		_delay_ms(300);
 		
@@ -152,24 +155,15 @@ int main(void)
 		TIFR1 = (1<<TOV1);          //clear timer1 overflow flag
 		trash =  read_tim1();                //stop timer1
 
-		if ((puls_comp.start1 == 1) && (puls_comp.start2 == 1))
-		{		
+		if ((puls_comp[count].start1 == 1) && (puls_comp[count].start2 == 1))
+		{
 			
-		puls_comp.address_    = reverse(puls_comp.address_);
-		puls_comp.address_INV = reverse(puls_comp.address_INV);
-		puls_comp.command_    = reverse(puls_comp.command_);
-		puls_comp.command_INV = reverse(puls_comp.command_INV);	
-		for (char z = 0;z < 8;z++)
-		{*/
-		serial_debug("sending:");	
-		_delay_ms(1500);
-		send_start_bit(); 
-		send_8bits(puls_comp.address_);
-		send_8bits(puls_comp.address_INV);
-		send_8bits(puls_comp.command_);
-		send_8bits(puls_comp.command_INV);
-		send_end_bit();
-		/*}
+		puls_comp[count].address_    = reverse(puls_comp[count].address_);
+		puls_comp[count].address_INV = reverse(puls_comp[count].address_INV);
+		puls_comp[count].command_    = reverse(puls_comp[count].command_);
+		puls_comp[count].command_INV = reverse(puls_comp[count].command_INV);
+		count++;	
+
 		serial_debug("signal");
 		signal_num++;
 		itoa(signal_num,buffer2,9);
@@ -178,10 +172,22 @@ int main(void)
 		}
 			puls_num = 0;
 			bit_num = 0;
-			puls_comp.start1 = 0;
-			puls_comp.start2 = 0;*/
+	}
+	_delay_ms(10000);
+		for (char z = 0;z < 5;z++)
+		{
+			serial_debug("sending:");
+			_delay_ms(4000);
+			send_start_bit();
+			send_8bits(puls_comp[z].address_);
+			send_8bits(puls_comp[z].address_INV);
+			send_8bits(puls_comp[z].command_);
+			send_8bits(puls_comp[z].command_INV);
+			send_end_bit();
 		}
-		}
+		count = 0;
+	}
+}
 		
 				/*serial_debug("sending:");
 				_delay_ms(1500);

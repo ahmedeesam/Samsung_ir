@@ -10,7 +10,7 @@
 #define VAR_H_
 
 
-char trash;
+char trash ,count;
 int bit_num = 0;
 int puls_num = 0;                  //number of pulses of one signal
 char buffer1[16],buffer2[10];
@@ -27,7 +27,7 @@ typedef struct
 	int command_INV ;
 } puls_components;
 
-puls_components puls_comp;
+puls_components puls_comp[4];
 
 
 
