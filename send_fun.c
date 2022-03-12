@@ -11,7 +11,7 @@
 void send_start_bit()
 {
 	start_tim0_38khz(); //  9ms High pulse
-	start_tim1_ctc(4500);
+	start_tim1_ctc(9000);
 	see_compare();
 	
 	stop_tim0_38khz();  // 4.5ms Low pulse
